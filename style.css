@@ -1,0 +1,168 @@
+/* RESET & VARIABLES */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --font-serif: 'Apple Garamond', 'EB Garamond', serif;
+    --font-sans: 'Inter', sans-serif;
+    --transition-smooth: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* NAVIGATION */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    z-index: 1000;
+    mix-blend-mode: difference;
+}
+
+.logo-img {
+    height: 18px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.nav-links a {
+    font-family: var(--font-sans);
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* HERO SECTION */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 40px 30px;
+    background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), 
+                url('mockup3.jpg') center/cover no-repeat;
+}
+
+.hero-content h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(3rem, 15vw, 10rem);
+    font-weight: 400;
+    line-height: 0.9;
+}
+
+.hero-content p {
+    font-family: var(--font-sans);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    margin-top: 15px;
+    text-transform: uppercase;
+}
+
+/* GRILLE DE PRODUITS */
+.product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background-color: #1a1a1a;
+}
+
+.product-item {
+    background-color: var(--bg-color);
+    cursor: pointer;
+}
+
+.product-img {
+    height: 85vh;
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(100%);
+    transition: var(--transition-smooth);
+}
+
+.product-item:hover .product-img {
+    filter: grayscale(0%);
+}
+
+.product-info {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    font-family: var(--font-sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* SECTION MATÉRIAUX */
+.materials-section {
+    padding: 100px 30px;
+    border-top: 1px solid #1a1a1a;
+}
+
+.materials-header h2 {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+}
+
+.materials-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.material-card {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+}
+
+.material-card h3 {
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.material-card p {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: #888;
+}
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 768px) {
+    nav {
+        padding: 20px;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr; /* Un seul produit par ligne */
+    }
+
+    .product-img {
+        height: 70vh; /* Moins haut sur mobile pour voir le défilement */
+    }
+
+    .materials-content {
+        grid-template-columns: 1fr; /* Matériaux en liste verticale */
+    }
+
+    .hero-content h1 {
+        font-size: 4rem;
+    }
+}

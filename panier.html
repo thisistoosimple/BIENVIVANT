@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bien Vivant | Panier</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=Inter:wght@400;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black:      #0a0a0a;
+            --white:      #f4f2ee;
+            --grey-light: #e8e5df;
+            --grey-mid:   #b0ab9f;
+            --grey-dark:  #4a4540;
+            --accent:     #c8b89a;
+            --border:     rgba(244, 242, 238, 0.08);
+            --border-md:  rgba(244, 242, 238, 0.15);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--black);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 48px;
+            height: 72px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(10,10,10,0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .logo-img {
+            height: 32px;
+            width: auto;
+            filter: invert(1) brightness(0.9);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--grey-mid);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active { color: var(--white); }
+
+        /* ─── BREADCRUMB ─── */
+        .breadcrumb {
+            margin-top: 72px;
+            padding: 20px 48px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-bottom: 1px solid rgba(244,242,238,0.06);
+        }
+
+        .breadcrumb a, .breadcrumb span {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: var(--grey-dark);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--grey-mid); }
+        .breadcrumb .current { color: var(--grey-mid); }
+
+        /* ─── PAGE HEADER ─── */
+        .page-header {
+            padding: 64px 48px 48px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: baseline;
+            gap: 24px;
+        }
+
+        .page-header h1 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: clamp(48px, 6vw, 80px);
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1;
+            color: var(--white);
+        }
+
+        .cart-count-badge {
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: var(--grey-dark);
+            align-self: flex-end;
+            padding-bottom: 6px;
+        }
+
+        /* ─── LAYOUT ─── */
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            align-items: start;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* ─── ITEMS COLUMN ─── */
+        .cart-items {
+            border-right: 1px solid var(--border);
+        }
+
+        /* ─── SINGLE ITEM ─── */
+        .cart-item {
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 32px;
+            align-items: start;
+            padding: 40px 48px;
+            border-bottom: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(16px);
+            animation: fadeUp 0.5s ease forwards;
+            transition: background 0.3s ease;
+        }
+
+        .cart-item:hover { background: rgba(244,242,238,0.02); }
+
+        .cart-item:nth-child(1) { animation-delay: 0.05s; }
+        .cart-item:nth-child(2) { animation-delay: 0.15s; }
+        .cart-item:nth-child(3) { animation-delay: 0.25s; }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* image */
+        .item-img {
+            width: 120px;
+            height: 150px;
+            background: #111;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s ease;
+        }
+
+        .cart-item:hover .item-img img {
+            transform: scale(1.04);
+        }
+
+        .item-img-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg, #1a1814 0%, #0d0c0b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-img-placeholder span {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 9px;
+            letter-spacing: 0.3em;
+            color: rgba(244,242,238,0.12);
+        }
+
+        /* details */
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 4px;
+        }
+
+        .item-collection {
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--grey-dark);
+        }
+
+        .item-name {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--white);
+            line-height: 1.1;
+        }
+
+        .item-name em { font-style: italic; color: var(--accent); }
+
+        .item-meta {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: var(--grey-dark);
+            margin-top: 4px;
+        }
+
+        /* quantity */
+        .item-qty {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-top: 20px;
+            width: fit-content;
+            border: 1px solid var(--border-md);
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            background: transparent;
+            border: none;
+            color: var(--grey-mid);
+            font-size: 16px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .qty-btn:hover {
+            background: rgba(244,242,238,0.06);
+            color: var(--white);
+        }
+
+        .qty-value {
+            width: 40px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            color: var(--white);
+            border-left: 1px solid var(--border-md);
+            border-right: 1px solid var(--border-md);
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-remove {
+            margin-top: 14px;
+            background: none;
+            border: none;
+            color: var(--grey-dark);
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            cursor: pointer;
+            padding: 0;
+            text-transform: uppercase;
+            transition: color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .item-remove:hover { color: var(--white); }
+
+        /* price col */
+        .item-price-col {
+            text-align: right;
+            padding-top: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .item-price {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--white);
+        }
+
+        .item-unit-price {
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: var(--grey-dark);
+        }
+
+        /* ─── EMPTY STATE ─── */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 48px;
+            text-align: center;
+            gap: 24px;
+        }
+
+        .empty-state.visible { display: flex; }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            border: 1px solid var(--border-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .empty-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--grey-dark);
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .empty-state h2 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 32px;
+            font-style: italic;
+            color: var(--grey-mid);
+        }
+
+        .empty-state p {
+            font-size: 11px;
+            color: var(--grey-dark);
+            letter-spacing: 0.12em;
+            line-height: 1.8;
+        }
+
+        .empty-state a {
+            margin-top: 8px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--white);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-md);
+            padding-bottom: 4px;
+            transition: border-color 0.2s;
+        }
+
+        .empty-state a:hover { border-color: var(--white); }
+
+        /* ─── SUMMARY COLUMN ─── */
+        .cart-summary {
+            position: sticky;
+            top: 72px;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .summary-title {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--grey-dark);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        /* promo code */
+        .promo-block {
+            margin-bottom: 40px;
+        }
+
+        .promo-label {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: var(--grey-dark);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .promo-input-wrap {
+            display: flex;
+            border: 1px solid var(--border-md);
+            overflow: hidden;
+        }
+
+        .promo-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 13px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            color: var(--white);
+        }
+
+        .promo-input::placeholder { color: var(--grey-dark); }
+
+        .promo-btn {
+            background: transparent;
+            border: none;
+            border-left: 1px solid var(--border-md);
+            padding: 0 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            color: var(--grey-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .promo-btn:hover { color: var(--white); background: rgba(244,242,238,0.04); }
+
+        /* totals */
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-line:first-of-type { border-top: 1px solid var(--border); }
+
+        .summary-line span:first-child {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: var(--grey-dark);
+            text-transform: uppercase;
+        }
+
+        .summary-line span:last-child {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 17px;
+            color: var(--grey-mid);
+        }
+
+        .summary-line.total {
+            padding: 24px 0;
+            border-bottom: none;
+            margin-top: 8px;
+        }
+
+        .summary-line.total span:first-child {
+            font-size: 11px;
+            color: var(--white);
+        }
+
+        .summary-line.total span:last-child {
+            font-size: 28px;
+            color: var(--white);
+        }
+
+        .summary-note {
+            font-size: 10px;
+            color: var(--grey-dark);
+            letter-spacing: 0.1em;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        /* checkout button */
+        .btn-checkout {
+            width: 100%;
+            padding: 20px 24px;
+            background: var(--white);
+            color: var(--black);
+            border: 1px solid var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        .btn-checkout::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--black);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+            z-index: 0;
+        }
+
+        .btn-checkout:hover { color: var(--white); }
+        .btn-checkout:hover::after { transform: scaleX(1); transform-origin: left; }
+
+        .btn-checkout span { position: relative; z-index: 1; }
+
+        .btn-continue {
+            width: 100%;
+            padding: 16px 24px;
+            background: transparent;
+            color: var(--grey-dark);
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            cursor: pointer;
+            transition: color 0.2s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .btn-continue:hover { color: var(--grey-mid); }
+
+        /* trust signals */
+        .trust-items {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .trust-item svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--grey-dark);
+            fill: none;
+            stroke-width: 1.5;
+            flex-shrink: 0;
+        }
+
+        .trust-item span {
+            font-size: 10px;
+            color: var(--grey-dark);
+            letter-spacing: 0.12em;
+            line-height: 1.5;
+        }
+
+        /* ─── PROMO FEEDBACK ─── */
+        .promo-feedback {
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            margin-top: 8px;
+            height: 16px;
+            transition: opacity 0.3s;
+        }
+
+        .promo-feedback.success { color: var(--accent); }
+        .promo-feedback.error   { color: #c0604a; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 960px) {
+            nav { padding: 0 24px; }
+            .breadcrumb { padding: 20px 24px; }
+            .page-header { padding: 48px 24px 36px; }
+            .cart-layout { grid-template-columns: 1fr; }
+            .cart-items { border-right: none; }
+            .cart-summary {
+                position: static;
+                padding: 40px 24px;
+                border-top: 1px solid var(--border);
+            }
+            .cart-item { padding: 32px 24px; gap: 20px; }
+            .item-img { width: 90px; height: 112px; }
+        }
+
+        @media (max-width: 540px) {
+            .cart-item { grid-template-columns: 80px 1fr; }
+            .item-price-col { display: none; }
+            .item-name { font-size: 18px; }
+        }
+
+        /* ─── REMOVE ANIMATION ─── */
+        .cart-item.removing {
+            animation: itemOut 0.4s ease forwards;
+        }
+
+        @keyframes itemOut {
+            to {
+                opacity: 0;
+                transform: translateX(-24px);
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                overflow: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="logo">
+            <img src="lis_logo.png" alt="Bien Vivant" class="logo-img"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span style="display:none; font-family:'EB Garamond',serif; font-size:18px; font-style:italic; letter-spacing:0.1em;">Bien Vivant</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">SHOP</a>
+            <a href="panier.html" class="active">PANIER (<span id="nav-count">2</span>)</a>
+        </div>
+    </nav>
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+        <a href="index.html">ACCUEIL</a>
+        <span class="sep">&nbsp;/&nbsp;</span>
+        <span class="current">PANIER</span>
+    </div>
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+        <h1>Mon Panier</h1>
+        <span class="cart-count-badge" id="header-count">2 PIÈCES</span>
+    </header>
+
+    <!-- CART LAYOUT -->
+    <div class="cart-layout">
+
+        <!-- ITEMS -->
+        <div class="cart-items" id="cart-items-container">
+
+            <!-- ITEM 1 -->
+            <div class="cart-item" data-id="1" data-price="890">
+                <div class="item-img">
+                    <img src="mockup.jpg" alt="PIÈCE N°01"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="item-img-placeholder" style="display:none;">
+                        <span>N°01</span>
+                    </div>
+                </div>
+                <div class="item-details">
+                    <span class="item-collection">COLLECTION RÊVERIE 1.0</span>
+                    <h2 class="item-name">PIÈCE N°01 <em>Rêverie</em></h2>
+                    <p class="item-meta">TAILLE&nbsp;&nbsp;M&nbsp;&nbsp;·&nbsp;&nbsp;COTON JAPONAIS 400 GSM</p>
+                    <div class="item-qty">
+                        <button class="qty-btn" data-action="minus" aria-label="Diminuer">−</button>
+                        <div class="qty-value">1</div>
+                        <button class="qty-btn" data-action="plus" aria-label="Augmenter">+</button>
+                    </div>
+                    <button class="item-remove">Supprimer</button>
+                </div>
+                <div class="item-price-col">
+                    <span class="item-price">890€</span>
+                    <span class="item-unit-price">890€ / PIÈCE</span>
+                </div>
+            </div>
+
+            <!-- ITEM 2 -->
+            <div class="cart-item" data-id="2" data-price="550">
+                <div class="item-img">
+                    <img src="mockup2.jpg" alt="PIÈCE N°02"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="item-img-placeholder" style="display:none;">
+                        <span>N°02</span>
+                    </div>
+                </div>
+                <div class="item-details">
+                    <span class="item-collection">COLLECTION RÊVERIE 1.0</span>
+                    <h2 class="item-name">PIÈCE N°02 <em>Rêverie</em></h2>
+                    <p class="item-meta">TAILLE&nbsp;&nbsp;S&nbsp;&nbsp;·&nbsp;&nbsp;FIBRES ÉCO-CERTIFIÉES</p>
+                    <div class="item-qty">
+                        <button class="qty-btn" data-action="minus" aria-label="Diminuer">−</button>
+                        <div class="qty-value">1</div>
+                        <button class="qty-btn" data-action="plus" aria-label="Augmenter">+</button>
+                    </div>
+                    <button class="item-remove">Supprimer</button>
+                </div>
+                <div class="item-price-col">
+                    <span class="item-price">550€</span>
+                    <span class="item-unit-price">550€ / PIÈCE</span>
+                </div>
+            </div>
+
+            <!-- EMPTY STATE (hidden by default) -->
+            <div class="empty-state" id="empty-state">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                </div>
+                <h2>Panier vide</h2>
+                <p>Votre sélection attend d'être composée.<br>Découvrez la collection Rêverie 1.0.</p>
+                <a href="index.html">EXPLORER LA COLLECTION</a>
+            </div>
+
+        </div>
+
+        <!-- SUMMARY -->
+        <aside class="cart-summary">
+            <p class="summary-title">Récapitulatif</p>
+
+            <!-- promo code -->
+            <div class="promo-block">
+                <p class="promo-label">Code promotionnel</p>
+                <div class="promo-input-wrap">
+                    <input class="promo-input" type="text" placeholder="EX. REVERIE10" id="promo-input" autocomplete="off" spellcheck="false">
+                    <button class="promo-btn" id="promo-apply">APPLIQUER</button>
+                </div>
+                <p class="promo-feedback" id="promo-feedback"></p>
+            </div>
+
+            <!-- totals -->
+            <div class="summary-line">
+                <span>Sous-total</span>
+                <span id="subtotal">1 440€</span>
+            </div>
+            <div class="summary-line">
+                <span>Livraison</span>
+                <span>Offerte</span>
+            </div>
+            <div class="summary-line" id="discount-line" style="display:none;">
+                <span>Réduction</span>
+                <span id="discount-val" style="color:var(--accent);">−144€</span>
+            </div>
+            <div class="summary-line total">
+                <span>Total</span>
+                <span id="total">1 440€</span>
+            </div>
+
+            <p class="summary-note">Taxes incluses. Livraison offerte pour toute commande. Retours acceptés sous 14 jours.</p>
+
+            <button class="btn-checkout">
+                <span>PASSER LA COMMANDE</span>
+            </button>
+            <a href="index.html" class="btn-continue">← Continuer mes achats</a>
+
+            <!-- trust -->
+            <div class="trust-items">
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    <span>Paiement 100% sécurisé</span>
+                </div>
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Données protégées — SSL</span>
+                </div>
+                <div class="trust-item">
+                    <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-3.36L1 10"/></svg>
+                    <span>Retours gratuits sous 14 jours</span>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+    (function () {
+        // ── CART STATE ──
+        const state = {
+            items: [
+                { id: 1, price: 890, qty: 1 },
+                { id: 2, price: 550, qty: 1 },
+            ],
+            discount: 0,
+        };
+
+        // ── HELPERS ──
+        function fmt(n) {
+            return n.toLocaleString('fr-FR') + '€';
+        }
+
+        function subtotal() {
+            return state.items.reduce((s, it) => s + it.price * it.qty, 0);
+        }
+
+        function updateSummary() {
+            const sub = subtotal();
+            const total = Math.max(0, sub - state.discount);
+            document.getElementById('subtotal').textContent = fmt(sub);
+            document.getElementById('total').textContent = fmt(total);
+
+            const discLine = document.getElementById('discount-line');
+            if (state.discount > 0) {
+                discLine.style.display = 'flex';
+                document.getElementById('discount-val').textContent = '−' + fmt(state.discount);
+            } else {
+                discLine.style.display = 'none';
+            }
+
+            const count = state.items.reduce((s, it) => s + it.qty, 0);
+            document.getElementById('nav-count').textContent = count;
+            document.getElementById('header-count').textContent =
+                count + ' PIÈCE' + (count > 1 ? 'S' : '');
+
+            // empty state
+            const container = document.getElementById('cart-items-container');
+            const empty = document.getElementById('empty-state');
+            if (state.items.length === 0) {
+                empty.classList.add('visible');
+                document.getElementById('header-count').textContent = '0 PIÈCE';
+            } else {
+                empty.classList.remove('visible');
+            }
+        }
+
+        function updateItemPrice(id) {
+            const it = state.items.find(i => i.id === id);
+            const el = document.querySelector(`.cart-item[data-id="${id}"]`);
+            if (!el || !it) return;
+            const price = el.querySelector('.item-price');
+            const unit  = el.querySelector('.item-unit-price');
+            if (price) price.textContent = fmt(it.price * it.qty);
+            if (unit)  unit.textContent  = fmt(it.price) + ' / PIÈCE';
+            el.querySelector('.qty-value').textContent = it.qty;
+        }
+
+        // ── QTY BUTTONS ──
+        document.querySelectorAll('.cart-item').forEach(el => {
+            const id = parseInt(el.dataset.id);
+
+            el.querySelectorAll('.qty-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const it = state.items.find(i => i.id === id);
+                    if (!it) return;
+                    if (btn.dataset.action === 'plus') {
+                        it.qty++;
+                    } else {
+                        if (it.qty > 1) it.qty--;
+                    }
+                    updateItemPrice(id);
+                    updateSummary();
+                });
+            });
+
+            // REMOVE
+            el.querySelector('.item-remove').addEventListener('click', () => {
+                el.classList.add('removing');
+                el.addEventListener('animationend', () => {
+                    el.remove();
+                    state.items = state.items.filter(i => i.id !== id);
+                    updateSummary();
+                }, { once: true });
+            });
+        });
+
+        // ── PROMO CODE ──
+        const VALID_CODES = { 'REVERIE10': 0.10, 'BIENVIVANT': 0.15 };
+        let promoApplied = false;
+
+        document.getElementById('promo-apply').addEventListener('click', () => {
+            if (promoApplied) return;
+            const val = document.getElementById('promo-input').value.trim().toUpperCase();
+            const fb  = document.getElementById('promo-feedback');
+
+            if (VALID_CODES[val]) {
+                const pct = VALID_CODES[val];
+                state.discount = Math.round(subtotal() * pct);
+                promoApplied = true;
+                fb.textContent = `Code accepté — ${pct * 100}% de réduction appliqué.`;
+                fb.className = 'promo-feedback success';
+                document.getElementById('promo-input').disabled = true;
+                document.getElementById('promo-apply').style.opacity = '0.3';
+                document.getElementById('promo-apply').style.pointerEvents = 'none';
+            } else {
+                fb.textContent = 'Code invalide ou expiré.';
+                fb.className = 'promo-feedback error';
+            }
+            updateSummary();
+        });
+
+        document.getElementById('promo-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('promo-apply').click();
+        });
+
+        // ── INIT ──
+        updateSummary();
+    })();
+    </script>
+
+</body>
+</html>
