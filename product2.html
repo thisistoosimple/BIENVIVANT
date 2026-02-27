@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bien Vivant | PIÈCE N°02 — Rêverie</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&family=Inter:wght@400;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #0a0a0a;
+            --white: #f4f2ee;
+            --grey-light: #e8e5df;
+            --grey-mid: #b0ab9f;
+            --grey-dark: #4a4540;
+            --accent: #c8b89a;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--black);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 48px;
+            height: 72px;
+            border-bottom: 1px solid rgba(244, 242, 238, 0.08);
+            background: rgba(10, 10, 10, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .logo-img {
+            height: 32px;
+            width: auto;
+            filter: invert(1) brightness(0.9);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--grey-mid);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--white); }
+
+        /* ── BREADCRUMB ── */
+        .breadcrumb {
+            margin-top: 72px;
+            padding: 20px 48px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-bottom: 1px solid rgba(244, 242, 238, 0.06);
+        }
+
+        .breadcrumb a, .breadcrumb span {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: var(--grey-dark);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover { color: var(--grey-mid); }
+        .breadcrumb .sep { color: var(--grey-dark); }
+        .breadcrumb .current { color: var(--grey-mid); }
+
+        /* ── PRODUCT LAYOUT ── */
+        .product-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* ── IMAGE PANE ── */
+        .product-visual {
+            position: sticky;
+            top: 72px;
+            height: calc(100vh - 72px);
+            overflow: hidden;
+            background: #111;
+        }
+
+        .product-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .product-visual img.loaded { opacity: 1; }
+
+        .product-visual .img-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg, #1a1814 0%, #0d0c0b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .img-label {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            color: rgba(244, 242, 238, 0.12);
+            text-transform: uppercase;
+        }
+
+        /* ── INFO PANE ── */
+        .product-info {
+            padding: 64px 64px 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border-left: 1px solid rgba(244, 242, 238, 0.06);
+        }
+
+        .product-collection {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--grey-dark);
+            margin-bottom: 16px;
+        }
+
+        .product-title {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: clamp(40px, 5vw, 64px);
+            font-weight: 400;
+            line-height: 1.05;
+            margin-bottom: 8px;
+            color: var(--white);
+        }
+
+        .product-title em {
+            font-style: italic;
+            color: var(--accent);
+        }
+
+        .product-subtitle {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--grey-dark);
+            margin-bottom: 40px;
+        }
+
+        .product-price {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 48px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(244, 242, 238, 0.08);
+            margin-bottom: 40px;
+        }
+
+        /* ── SIZE SELECTOR ── */
+        .size-label {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--grey-dark);
+            margin-bottom: 16px;
+        }
+
+        .size-grid {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 48px;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            background: transparent;
+            border: 1px solid rgba(244, 242, 238, 0.15);
+            color: var(--grey-mid);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            overflow: hidden;
+        }
+
+        .size-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--white);
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+
+        .size-btn span {
+            position: relative;
+            z-index: 1;
+            transition: color 0.25s ease;
+        }
+
+        .size-btn:hover {
+            border-color: rgba(244, 242, 238, 0.4);
+            color: var(--white);
+        }
+
+        .size-btn:hover::before {
+            transform: scaleY(0.15);
+        }
+
+        .size-btn.selected {
+            border-color: var(--white);
+            color: var(--black);
+        }
+
+        .size-btn.selected::before {
+            transform: scaleY(1);
+        }
+
+        .size-btn.selected span {
+            color: var(--black);
+        }
+
+        .size-btn.out-of-stock {
+            opacity: 0.25;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .size-btn.out-of-stock::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 10%;
+            width: 80%;
+            height: 1px;
+            background: var(--grey-dark);
+            transform: rotate(-25deg);
+        }
+
+        /* ── BUTTONS ── */
+        .btn-primary {
+            width: 100%;
+            padding: 18px 24px;
+            background: var(--white);
+            color: var(--black);
+            border: 1px solid var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--black);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+
+        .btn-primary:hover {
+            color: var(--white);
+        }
+
+        .btn-primary:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 18px 24px;
+            background: transparent;
+            color: var(--grey-mid);
+            border: 1px solid rgba(244, 242, 238, 0.15);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 40px;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(244, 242, 238, 0.4);
+            color: var(--white);
+        }
+
+        /* ── PRODUCT DETAILS ── */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(244, 242, 238, 0.08);
+        }
+
+        .detail-group h4 {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--grey-dark);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+
+        .detail-group ul {
+            list-style: none;
+        }
+
+        .detail-group ul li {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 15px;
+            color: var(--grey-mid);
+            line-height: 1.8;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .detail-group ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: var(--grey-dark);
+            font-size: 12px;
+        }
+
+        /* ── MATERIALS SECTION ── */
+        .materials-section {
+            padding: 120px 48px;
+            border-top: 1px solid rgba(244, 242, 238, 0.08);
+        }
+
+        .materials-header {
+            margin-bottom: 64px;
+        }
+
+        .materials-header h2 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: clamp(36px, 4vw, 56px);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--white);
+        }
+
+        .materials-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: rgba(244, 242, 238, 0.06);
+        }
+
+        .material-card {
+            background: var(--black);
+            padding: 48px 40px;
+            transition: background 0.3s ease;
+        }
+
+        .material-card:hover {
+            background: #111;
+        }
+
+        .material-card .label {
+            display: block;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.22em;
+            color: var(--grey-dark);
+            margin-bottom: 20px;
+        }
+
+        .material-card h3 {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--white);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .material-card p {
+            font-size: 12px;
+            color: var(--grey-mid);
+            line-height: 1.7;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            padding: 64px 48px 40px;
+            border-top: 1px solid rgba(244, 242, 238, 0.08);
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 48px;
+            gap: 48px;
+        }
+
+        .footer-brand {
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 28px;
+            font-weight: 400;
+            font-style: italic;
+            color: var(--white);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .footer-links a {
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            color: var(--grey-dark);
+            text-decoration: none;
+            transition: color 0.2s;
+            text-transform: uppercase;
+        }
+
+        .footer-links a:hover { color: var(--grey-mid); }
+
+        .footer-bottom {
+            padding-top: 32px;
+            border-top: 1px solid rgba(244, 242, 238, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom p {
+            font-size: 10px;
+            color: var(--grey-dark);
+            letter-spacing: 0.12em;
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--white);
+            color: var(--black);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            padding: 16px 32px;
+            z-index: 200;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            nav { padding: 0 24px; }
+            .breadcrumb { padding: 20px 24px; }
+            .product-main { grid-template-columns: 1fr; }
+            .product-visual { position: relative; top: 0; height: 60vw; min-height: 320px; }
+            .product-info { padding: 40px 24px 60px; border-left: none; border-top: 1px solid rgba(244,242,238,0.06); }
+            .materials-section { padding: 80px 24px; }
+            .materials-content { grid-template-columns: 1fr; }
+            footer { padding: 48px 24px 32px; }
+            .footer-top { flex-direction: column; gap: 32px; }
+            .footer-links { flex-wrap: wrap; gap: 24px; }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+            .details-grid { grid-template-columns: 1fr; gap: 24px; }
+        }
+
+        /* ── PAGE ENTER ANIMATION ── */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.7s ease forwards;
+        }
+        .fade-in:nth-child(1) { animation-delay: 0.1s; }
+        .fade-in:nth-child(2) { animation-delay: 0.2s; }
+        .fade-in:nth-child(3) { animation-delay: 0.3s; }
+        .fade-in:nth-child(4) { animation-delay: 0.4s; }
+        .fade-in:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <img src="lis_logo.png" alt="Bien Vivant" class="logo-img">
+        </div>
+        <div class="nav-links">
+            <a href="index.html">SHOP</a>
+            <a href="panier.html">PANIER (0)</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="index.html">ACCUEIL</a>
+        <span class="sep">/</span>
+        <a href="index.html">RÊVERIE 1.0</a>
+        <span class="sep">/</span>
+        <span class="current">PIÈCE N°02</span>
+    </div>
+
+    <div class="product-main">
+        <!-- IMAGE -->
+        <div class="product-visual">
+            <img src="mockup2.jpg" alt="PIÈCE N°02 — Rêverie"
+                 onload="this.classList.add('loaded')"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="img-placeholder" style="display:none;">
+                <span class="img-label">PIÈCE N°02</span>
+            </div>
+        </div>
+
+        <!-- INFO -->
+        <div class="product-info">
+            <div class="fade-in">
+                <p class="product-collection">COLLECTION RÊVERIE 1.0</p>
+                <h1 class="product-title">PIÈCE N°02 <em>Rêverie</em></h1>
+                <p class="product-subtitle">COTON JAPONAIS · 400 GSM · COUPE FÉMININE</p>
+            </div>
+
+            <div class="fade-in">
+                <p class="product-price">550€</p>
+            </div>
+
+            <div class="divider fade-in"></div>
+
+            <!-- SIZE -->
+            <div class="fade-in">
+                <p class="size-label">TAILLE</p>
+                <div class="size-grid" id="size-grid">
+                    <button class="size-btn" data-size="XS"><span>XS</span></button>
+                    <button class="size-btn" data-size="S"><span>S</span></button>
+                    <button class="size-btn selected" data-size="M"><span>M</span></button>
+                    <button class="size-btn" data-size="L"><span>L</span></button>
+                    <button class="size-btn out-of-stock" data-size="XL" title="Rupture de stock"><span>XL</span></button>
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="fade-in">
+                <button class="btn-primary" id="add-to-cart">
+                    <span>AJOUTER AU PANIER</span>
+                </button>
+                <button class="btn-secondary">ENREGISTRER</button>
+            </div>
+
+            <!-- DETAILS -->
+            <div class="details-grid fade-in">
+                <div class="detail-group">
+                    <h4>Composition</h4>
+                    <ul>
+                        <li>Fabriqué en Italie</li>
+                        <li>Coton japonais 400 GSM</li>
+                        <li>Fibres éco-certifiées</li>
+                        <li>Poches intérieures</li>
+                    </ul>
+                </div>
+                <div class="detail-group">
+                    <h4>Entretien</h4>
+                    <ul>
+                        <li>Nettoyage à sec</li>
+                        <li>Ne pas blanchir</li>
+                        <li>Fer basse température</li>
+                        <li>Suspendre sur cintre</li>
+                    </ul>
+                </div>
+                <div class="detail-group">
+                    <h4>Livraison</h4>
+                    <ul>
+                        <li>Livraison mondiale offerte</li>
+                        <li>Express disponible</li>
+                        <li>Retours sous 14 jours</li>
+                    </ul>
+                </div>
+                <div class="detail-group">
+                    <h4>Engagement</h4>
+                    <ul>
+                        <li>Expédition neutre en CO₂</li>
+                        <li>Emballage recyclé</li>
+                        <li>Production éthique</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATÉRIAUX -->
+    <section class="materials-section">
+        <div class="materials-header">
+            <h2>Ingénierie Textile</h2>
+        </div>
+        <div class="materials-content">
+            <div class="material-card">
+                <span class="label">01</span>
+                <h3>Coton Japonais 400 GSM</h3>
+                <p>Un tissage dense offrant une tenue architecturale unique.</p>
+            </div>
+            <div class="material-card">
+                <span class="label">02</span>
+                <h3>Fibres Éco-Certifiées</h3>
+                <p>Sélectionnées pour leur impact minimal et un confort absolu.</p>
+            </div>
+            <div class="material-card">
+                <span class="label">03</span>
+                <h3>Assemblage Main</h3>
+                <p>Précision chirurgicale honorant le savoir-faire couture.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-top">
+            <span class="footer-brand">Bien Vivant</span>
+            <div class="footer-links">
+                <a href="index.html">SHOP</a>
+                <a href="#">COUTURE</a>
+                <a href="#">ACCESSOIRES</a>
+                <a href="#">CONTACT</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 BIEN VIVANT. TOUS DROITS RÉSERVÉS.</p>
+            <p>POLITIQUE DE CONFIDENTIALITÉ · CGV · COOKIES</p>
+        </div>
+    </footer>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">ARTICLE AJOUTÉ AU PANIER</div>
+
+    <script>
+        // SIZE SELECTION
+        const sizeBtns = document.querySelectorAll('.size-btn:not(.out-of-stock)');
+        let selectedSize = 'M';
+
+        sizeBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                sizeBtns.forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedSize = this.dataset.size;
+            });
+        });
+
+        // ADD TO CART
+        const toast = document.getElementById('toast');
+        let toastTimeout;
+
+        document.getElementById('add-to-cart').addEventListener('click', function () {
+            clearTimeout(toastTimeout);
+            toast.classList.add('show');
+            toastTimeout = setTimeout(() => toast.classList.remove('show'), 2400);
+        });
+
+        // Image fallback (already handled inline)
+        // Detect if mockup.jpg exists; show placeholder div otherwise
+        const productImg = document.querySelector('.product-visual img');
+        productImg.src = 'mockup2.jpg';
+    </script>
+</body>
+</html>
